@@ -197,6 +197,61 @@ and was clean: both reports updated, nothing else changed. A refusal changed not
 in the Windows app use the same grid, so they should round-trip; the edit above was on a
 camera whose zones came from that app.
 
+## Detection: how many marks before the appearance check may decide
+
+The appearance check learns from the Yes / No marks and for now only *scores* events. It may become
+part of the alert (a Yes-looking event fires, a No-looking one does not) only when the evidence below
+is in. Retraining itself is harmless while it only observes, so it is done often; **promotion** is the
+decision that needs a target.
+
+**The risk that sets the target.** The check must never suppress a real delivery. So the number that
+matters is how many real events (Yes marks) it has been shown to recognise, not how many No marks
+there are. If every Yes is recognised on pictures the model had not seen (leave-one-out), the true miss
+rate can still only be bounded: with all of *n* recognised, the 95% upper bound on the miss rate is
+about 3 / *n* (the "rule of three").
+
+| Yes marks (all recognised) | Miss rate could still be as high as |
+|---|---|
+| 12 (at the last training, 2026-10-21) | 25% |
+| 24 (2026-11-11) | 12% |
+| 40 | 7.5% |
+| 60 | 5% |
+| 100 | 3% |
+
+The same arithmetic applies to No marks and false alarms, which cost less (an unwanted alert, not a
+missed one), so the target for No is lower.
+
+**The decision.**
+
+*Retrain (observing only):* whenever **10 or more new marks** have been added to a rule since its last
+training. It takes a second and changes no alerts.
+
+*Promotion: let the check decide* for a rule only when **all** of these hold:
+
+1. **At least 40 Yes and 30 No marks** on that rule, each with a picture. (At 40 Yes the miss rate is
+   bounded at 7.5%, and the alert keeps size and zone as its first filter, so the check can only
+   remove alerts that already passed those, never add any.)
+2. **Coverage, not only count.** The Yes marks include at least 5 in low light (dusk, night, infrared),
+   at least 3 in rain or snow, and every vehicle or carrier that should count. The No marks include
+   each look-alike that has been seen (for a mail truck rule: other delivery vans, the garbage
+   truck). Count alone cannot show whether a rainy-night delivery would be recognised.
+3. **A winter of data for the mail truck rule**, at least 8 weeks spanning a change of season, because
+   the first marks come from one summer and autumn.
+4. **Leave-one-out misses no Yes** (recall 100%) and rejects **at least 95% of the No marks**.
+5. **A 4-week shadow period.** The check scores every new event *before* it is marked. When those
+   scores are compared with the Yes / No marks given afterwards, no real Yes was scored below the
+   threshold and at least 95% of the No marks scored below it. This tests it on data it could not
+   have learned from, in the order events arrive.
+
+If any miss shows up after promotion, switch the rule back to watching only and add that picture to
+the marks.
+
+**Where it stands (2026-11-11).** Mail truck rule: 24 Yes and 18 No (the model was last trained on 12 and
+15). The Yes marks are 2025 recordings replayed through the rule plus this autumn's live events, so
+there is nothing from winter yet. The two peacock rules have 36 Yes / 2 No and 13 Yes / 1 No: they
+cannot be trained at all (the minimum is 3 of each) and would not be useful until there are No marks
+(other birds, other animals), which may take a long time; leave them watch-only.
+
 ## Later
 
 - **Time lapse** (original has scenes, a schedule and size estimates).

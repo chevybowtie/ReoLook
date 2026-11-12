@@ -7,10 +7,13 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
 
 ### Vehicle and animal detection
 - [ ] **Appearance check is watching only.** It learns the marked Yes from the picture and scores
-  every event, but it cannot cause or stop an alert. On 27 marks it recognised 12 of 12 Yes and
-  rejected 15 of 15 No on pictures it had not seen. To finish: collect a few weeks of new events,
-  retrain, compare it with the size and timing rules, then make it a requirement for the alert
-  (a one-line change to the rule's firing condition). Keep size and zone as the first filter.
+  every event, but it cannot cause or stop an alert. Last trained on 12 Yes / 15 No (recognised 12 of
+  12 and rejected 15 of 15 on pictures it had not seen); the mail truck rule now has **24 Yes / 18 No**,
+  so retrain it (Settings > Detection > *Train from my Yes / No marks*). The target for letting it
+  decide is in `docs/roadmap.md` (*Detection: how many marks before the appearance check may decide*):
+  at least 40 Yes and 30 No with a picture, low-light, rain/snow and look-alike coverage, a winter of
+  data, no missed Yes on leave-one-out, and a 4-week shadow period. Retrain in between whenever 10 new
+  marks have been added. Keep size and zone as the first filter.
 - [ ] **Mail truck rule: one known false alarm.** A truck about 20% tall at 80–85% confidence
   (seen four times) passes size and confidence. The appearance check scores it 1–11%, so this ends
   once the check decides.
