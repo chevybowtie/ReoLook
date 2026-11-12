@@ -51,7 +51,8 @@ configuration or recordings, and cleans up when you stop it with Ctrl-C.
 - **Stopped-vehicle detection** (optional): an open object detector runs on this computer on the
   camera's own motion events. Draw a zone (the road in front of the mailbox), and a vehicle that
   stops there is tagged ("mail truck 14:12") on the Playback timeline, shown with its picture, and
-  sent to an MQTT broker. Frames never leave the machine.
+  sent to an MQTT broker. You confirm each detection with **Yes / No** buttons, which keeps the
+  timeline honest and trains an optional appearance check. Frames never leave the machine.
 - **Weekly recording schedule**, sound on motion, and a light/dark/system theme.
 - **Controls for PTZ, floodlight and siren** on cameras that have them (written to Reolink's
   documented API; not yet tried on such a camera).
@@ -237,8 +238,23 @@ rule would count it, so sizes can be set from what is really seen. Then save. Wh
 reports motion, ReoLook takes a frame about every 1.5 s, runs the detector (about 150 ms on a
 CPU) and follows vehicles; one that stays inside the zone is an event. It is tagged
 `<event name> HH:MM`, appears as a marker on that device's Playback track, and its picture is kept
-under `~/.local/share/reolook/detections/`. Say *Yes* or *No* to each event: those verdicts are
-the data for tuning.
+under `~/.local/share/reolook/detections/`.
+
+**Confirming detections (Yes / No).** Every event is listed under *Recent events* in Settings >
+Detection, with its picture, the camera, the type and confidence, and a **Was it?** row with **Yes**
+and **No** buttons (and **Delete**). Did the mail truck really stop, or was it something else? Mark
+each one:
+
+- Click the picture for a full-size view with the box the detector drew. There, **Yes** and **No**
+  work, and so do the keys **Y** and **N**; answering moves on to the next event, **←** and **→**
+  move without answering, and **Esc** closes. Click the same answer again to clear it.
+- The list starts on *Only the ones I have not marked*, so what still needs a verdict is what you
+  see; the line above it counts events marked Yes, marked No and still to review. A menu narrows
+  the list to one rule.
+- A **Yes** adds *(confirmed)* to the hover text of that event's marker on the Playback track. A
+  **No** removes the marker, so false alarms do not clutter the timeline.
+- The verdicts are the data for tuning: they show which size, zone and timing settings are right
+  (see *Replay* below), and they are what the optional *appearance check* learns from.
 
 **Replay.** To see what a rule would have done on recordings that already exist (a missed delivery,
 a false alarm, or the effect of a change) without waiting for tomorrow:
