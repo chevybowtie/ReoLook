@@ -1,0 +1,38 @@
+{
+  "name": "reolook",
+  "version": "0.0.1",
+  "description": "Linux client for Reolink cameras: live view, playback, motion-triggered recording, and device settings",
+  "keywords": [
+    "reolink",
+    "camera",
+    "nvr",
+    "rtsp",
+    "ffmpeg",
+    "mqtt",
+    "linux"
+  ],
+  "author": {
+    "name": "chevybowtie",
+    "url": "https://github.com/chevybowtie"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chevybowtie/ReoLook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chevybowtie/ReoLook/issues"
+  },
+  "homepage": "https://github.com/chevybowtie/ReoLook#readme",
+  "type": "module",
+  "bin": {
+    "reolook": "bin/reolook.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "start": "node bin/reolook.mjs open"
+  },
+  "license": "MIT"
+}

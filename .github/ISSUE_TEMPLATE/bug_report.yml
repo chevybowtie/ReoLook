@@ -1,0 +1,57 @@
+name: Bug report
+description: Something does not work, or works differently from what the README says.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Remove camera passwords, addresses and recordings from anything you paste here.**
+        For a security problem, do not use this form: see SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: ReoLook version
+      description: Settings > About, or the `version` in package.json.
+      placeholder: "0.0.1"
+    validations:
+      required: true
+  - type: input
+    id: camera
+    attributes:
+      label: Camera model and firmware
+      description: For a problem with a camera, its model and firmware version (`node bin/reolook.mjs info --host IP` prints them).
+      placeholder: "RLC-410-5MP, v3.0.0.136"
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Camera capabilities
+      description: For a problem with a camera feature, the output of `node bin/reolook.mjs capabilities --host IP`. Remove anything private.
+      render: text
+  - type: textarea
+    id: system
+    attributes:
+      label: Your system
+      description: Linux distribution, `node --version` and `ffmpeg -version | head -1`.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log lines
+      description: The relevant lines from `journalctl --user -u reolook`, or from `~/.cache/reolook/server.log`.
+      render: text
+  - type: checkboxes
+    id: private
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed passwords, addresses and recordings from everything above.
+          required: true

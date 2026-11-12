@@ -1,0 +1,24 @@
+# Reference copy of the systemd *user* unit. Prefer the installer, which fills in the real
+# paths, shows its plan first, and never overwrites your sign-in file:
+#   node bin/reolook.mjs service install            # add --dry-run to preview, --linger for boot-time start
+#   node bin/reolook.mjs service status | uninstall
+#
+# Logs:  journalctl --user -u reolook -f
+[Unit]
+Description=ReoLook recorder and viewer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/reolook/env
+WorkingDirectory=%h/Documents/projects/ReoLook
+ExecStart=/usr/bin/node %h/Documents/projects/ReoLook/bin/reolook.mjs serve
+Restart=on-failure
+RestartSec=10
+# SIGTERM finalizes in-progress recordings; give ffmpeg time to close the files.
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

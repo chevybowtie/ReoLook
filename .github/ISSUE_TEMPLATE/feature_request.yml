@@ -1,0 +1,24 @@
+name: Feature request
+description: An idea for something ReoLook could do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you are trying to do
+      description: The problem first, before the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like ReoLook to do
+  - type: input
+    id: camera
+    attributes:
+      label: Camera model, if it matters
+      placeholder: "for example E1 Zoom, firmware v3.x"
+  - type: markdown
+    attributes:
+      value: |
+        Reolink's own P2P protocol, firmware updates and restoring factory defaults are left out on purpose (see the README's Limits).

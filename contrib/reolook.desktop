@@ -1,0 +1,12 @@
+# Application-menu entry for ReoLook (not installed automatically).
+#   install -Dm644 contrib/reolook.desktop ~/.local/share/applications/reolook.desktop
+# Edit Exec= if the project lives somewhere else. Camera sign-in is read from
+# ~/.config/reolook/env (mode 600) because a menu launcher has no shell environment.
+[Desktop Entry]
+Type=Application
+Name=ReoLook
+Comment=Live view and playback for Reolink cameras
+Exec=/usr/bin/node %h/Documents/projects/ReoLook/bin/reolook.mjs open
+Terminal=false
+Categories=AudioVideo;Video;
+StartupWMClass=ReoLook

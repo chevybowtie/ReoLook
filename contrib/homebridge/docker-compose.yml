@@ -1,0 +1,17 @@
+# Homebridge, to present ReoLook's cameras to Apple's Home app (see docs/homekit.md).
+#
+#   cd contrib/homebridge
+#   docker compose up -d
+#   open http://localhost:8581     (first login: admin / admin, you are asked to change it)
+#
+# Host networking is required on Linux so that Apple devices can find it (Bonjour/mDNS).
+# The ./data folder holds its configuration, including any camera password you type into it,
+# so keep it private.
+services:
+  homebridge:
+    image: homebridge/homebridge:latest
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    volumes:
+      - ./data:/homebridge
