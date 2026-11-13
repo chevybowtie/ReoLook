@@ -65,8 +65,12 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
   a reboot; before that a hand-started copy ran under `sg www-data`). Restart it with
   `systemctl --user restart reolook`.
 - [x] **Start at boot is on** (lingering is enabled).
-- [ ] **Retention only reports.** About 1.3 TB / 26,000 clips. Decide
-  whether to turn on deletion (Settings > Storage) and with which rule.
+- [x] **Retention is on, with one rule: keep 200 GB free** (`retention.apply: true`, `minFreeGB: 200`;
+  decided 2026-11-13 to leave it as it is, with no age limit). About 1.3 TB / 27,000 clips, 1 TB free,
+  growing about 6 to 13 GB a day, so deletion starts in roughly 80 to 140 days. It deletes oldest first,
+  and the oldest ~700 GB is the Windows app's June to September 2025 footage (including a camera that is no
+  longer recorded), so copy that elsewhere first if you want to keep it. An age rule such as 365 days
+  would delete that 700 GB at its next hourly run.
 - [ ] **About 800 recordings start per day** across four outdoor cameras, mostly short. Worth
   looking at which camera produces most and whether motion zones or sensitivity should change.
 
