@@ -66,9 +66,11 @@ camera account is enough, and its password ends up in this file, so keep the fil
 }
 ```
 
-Use the camera's **sub stream** (`..._sub`), which is small enough to transcode comfortably. In
-the plugin's global settings enable its **HTTP server** (`"http": true`, default port 8080, check
-its README). It then accepts motion triggers such as:
+Use the camera's **sub stream** (`..._sub`), which is small enough to transcode comfortably. To let
+ReoLook trigger the camera, also set `"porthttp": 8080` on the same `Camera-ffmpeg` platform (the
+plugin starts its HTTP server only when this port is set; pick another port if 8080 is taken, and
+add `"localhttp": true` only if the caller runs on the same PC). Restart Homebridge, and the log
+shows `Setting up HTTP server on port 8080...`. It then accepts motion triggers such as:
 
 ```
 http://<the PC>:8080/motion?Front%20Porch          # something happened
@@ -76,9 +78,12 @@ http://<the PC>:8080/motion/reset?Front%20Porch    # it has gone
 http://<the PC>:8080/doorbell?Front%20Porch        # present it as a doorbell press
 ```
 
-Add the bridge to the Home app on your iPad (Add accessory, scan the code shown in the Homebridge
-UI). In the Home app open the camera, settings, and turn on the notification / show on Apple TV
-options.
+Pair in the Home app on your iPad (Add accessory, enter the code shown in the Homebridge UI or
+log). The camera plugin runs as its own **child bridge** with its own setup code and name
+("Homebridge Camera FFmpeg"), separate from the main Homebridge bridge, so pair that one. Then open
+the camera in the Home app, Settings, Status and Notifications, and turn on activity notifications
+and the Apple TV option. Doorbell events give the most reliable pop-up; Apple may throttle
+motion notifications.
 
 ## 3. ReoLook: point a rule at the bridge
 

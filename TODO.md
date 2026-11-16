@@ -31,11 +31,14 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
 - [ ] **MQTT has only been tested against a small fake broker.** Needs a real run: broker address,
   `REOLOOK_MQTT_USER` / `REOLOOK_MQTT_PASS` in `~/.config/reolook/env`, then "Send a test event".
   TLS (`mqtts://`) and Home Assistant discovery have not been tried against anything real.
-- [ ] **Apple TV pop-up (HomeKit) is not working yet.** Homebridge is running in Docker
-  (`contrib/homebridge/`). Still to do: install `homebridge-camera-ffmpeg`, add the camera, pair in
-  the Home app, turn on Apple TV notifications for the camera, put the doorbell/motion address in a
-  rule's web address, press "Send a test event". `docs/homekit.md` is written from the projects'
-  documentation and has not been run end to end.
+- [ ] **Apple TV pop-up (HomeKit) is not working yet.** Done: Homebridge runs in Docker
+  (`contrib/homebridge/`), `homebridge-camera-ffmpeg` 4.1.0 is installed, "Front Porch" is
+  configured (motion and doorbell on), and its HTTP trigger server is enabled (`porthttp` 8080;
+  `/motion/reset?Front%20Porch` answers 200). Still to do: pair the camera's child bridge in the
+  Home app, turn on activity notifications and the Apple TV option for the camera, confirm the Apple
+  TV shows as a home hub on the same network segment as this PC, put
+  `http://<PC>:8080/doorbell?Front%20Porch` in a rule's web address, press "Send a test event" and
+  see whether a pop-up appears. Then drop the "not run" warning from `docs/homekit.md`.
 
 ### Live view picture damage
 - [ ] **Watch for damaged live pictures.** ReoLook restarts a stream when its decoder reports bad
