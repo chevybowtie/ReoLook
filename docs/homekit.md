@@ -78,12 +78,19 @@ http://<the PC>:8080/motion/reset?Front%20Porch    # it has gone
 http://<the PC>:8080/doorbell?Front%20Porch        # present it as a doorbell press
 ```
 
-Pair in the Home app on your iPad (Add accessory, enter the code shown in the Homebridge UI or
-log). The camera plugin runs as its own **child bridge** with its own setup code and name
-("Homebridge Camera FFmpeg"), separate from the main Homebridge bridge, so pair that one. Then open
-the camera in the Home app, Settings, Status and Notifications, and turn on activity notifications
-and the Apple TV option. Doorbell events give the most reliable pop-up; Apple may throttle
-motion notifications.
+Pair in the Home app on your iPad (Add Accessory, More options, then pick the camera and enter
+the setup code shown in the Homebridge UI or log). This plugin publishes each camera as its **own
+accessory**, so the log says `Please add [Front Porch ...] manually in Home app. Setup Code: ...`;
+pair the camera itself. Then open the camera in the Home app, Settings, Status and Notifications,
+and turn on activity notifications and the Apple TV option. Doorbell events give the most reliable
+pop-up; Apple may throttle motion notifications.
+
+**Phone on a different VLAN.** Pairing finds the accessory by Bonjour (mDNS), which does not cross
+VLANs, and the Home app cannot be given an IP address. Either join the phone to a network on the
+bridge's VLAN just for pairing (afterwards the Apple TV hub relays everything, and the phone can be
+anywhere, the same as when away from home), or run an mDNS reflector between the VLANs (avahi, or a
+"Bonjour gateway" option on the router) and allow TCP from the phone's VLAN to the PC. The Apple TV
+and the bridge must stay on the same segment either way.
 
 ## 3. ReoLook: point a rule at the bridge
 

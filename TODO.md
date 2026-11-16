@@ -34,8 +34,8 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
 - [ ] **Apple TV pop-up (HomeKit) is not working yet.** Done: Homebridge runs in Docker
   (`contrib/homebridge/`), `homebridge-camera-ffmpeg` 4.1.0 is installed, "Front Porch" is
   configured (motion and doorbell on), and its HTTP trigger server is enabled (`porthttp` 8080;
-  `/motion/reset?Front%20Porch` answers 200). Still to do: pair the camera's child bridge in the
-  Home app, turn on activity notifications and the Apple TV option for the camera, confirm the Apple
+  `/motion/reset?Front%20Porch` answers 200). Still to do: pair the camera in the
+  Home app (it is its own accessory; the phone must be on the bridge's VLAN while pairing), turn on activity notifications and the Apple TV option for the camera, confirm the Apple
   TV shows as a home hub on the same network segment as this PC, put
   `http://<PC>:8080/doorbell?Front%20Porch` in a rule's web address, press "Send a test event" and
   see whether a pop-up appears. Then drop the "not run" warning from `docs/homekit.md`.
