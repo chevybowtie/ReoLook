@@ -302,7 +302,7 @@ it happens and, optionally, another when it has gone, with `{camera}`, `{label}`
 `{tag}` filled in. **Send a test event** in the rule sends a made-up event down exactly that path
 (MQTT and web address) and reports what each answered. *Home Assistant discovery* announces each
 rule as a sensor. To make a camera pop up over what an Apple TV is playing, see
-`docs/homekit.md`.
+`docs/homekit.md`; `reolook homekit` writes the Homebridge camera settings for all your cameras.
 
 The detection models and Python packages are downloaded by `detect setup`, not shipped in this
 repository; their licences are in `THIRD-PARTY-NOTICES.md`.
@@ -447,6 +447,7 @@ npm test         # node --test (about 480 tests, 12 s); needs ffmpeg and ffprobe
 | `src/admin.mjs`, `src/users.mjs`, `src/resolution.mjs`, `src/controls.mjs` | Administrator sessions, accounts, resolution change, live controls |
 | `src/discovery.mjs`, `src/net-probe.mjs` | Network scan and address checks |
 | `src/motion.mjs`, `src/schedule.mjs` | Motion area parsing, weekly recording schedule |
+| `src/homebridge.mjs` | The Homebridge camera settings for `reolook homekit` |
 | `src/detect/*`, `detector/helper.py`, `src/mqtt.mjs` | Vehicle detection: rules and tracker, the Python helper (YOLOX via onnxruntime), the event log, MQTT publisher |
 | `src/version.mjs` | This build's version, read from `package.json` |
 | `public/index.html` | The whole UI (no build step) |

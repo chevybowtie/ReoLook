@@ -6,6 +6,13 @@ All notable changes to ReoLook are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`reolook homekit`** prints the Homebridge `homebridge-camera-ffmpeg` settings for every camera
+  in ReoLook (sub stream for live video, the camera's snapshot address for stills, correctly encoded),
+  or merges them into Homebridge's `config.json` with `--write` (keeps a `.bak`, safe to re-run), and
+  lists the web addresses to give a detection rule. See `docs/homekit.md`.
+
 ## [0.0.1] - 2026-11-11
 
 The first version. What it does is described in [README.md](README.md); what is verified on real

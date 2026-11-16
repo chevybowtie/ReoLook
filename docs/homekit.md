@@ -10,7 +10,7 @@ ReoLook (detection rules) --web address / MQTT--> bridge container --HomeKit--> 
 ```
 
 > **What is verified.** ReoLook's side (the web address call, MQTT, the test button) is tested.
-> The bridge and Apple TV side below follows each project's documentation but has **not** been
+> The `homekit` command is tested. The bridge and Apple TV side below follows each project's documentation but has **not** been
 > run on your network by the author. Plugin settings change between versions: when a name here
 > disagrees with the plugin's own README, the README wins.
 
@@ -36,7 +36,7 @@ services:
     restart: always
     network_mode: host
     volumes:
-      - ./homebridge:/homebridge
+      - ./data:/homebridge
 ```
 
 ```sh
@@ -44,13 +44,59 @@ cd contrib/homebridge
 docker compose up -d
 ```
 
-Open `http://localhost:8581`, finish the setup wizard, then **Plugins**: install
-`homebridge-camera-ffmpeg`. In its settings, add the camera (adjust the address; a view-only
-camera account is enough, and its password ends up in this file, so keep the file private):
+Open `http://localhost:8581`, finish the setup wizard (the first login is `admin` / `admin`; you
+are asked to change it), then **Plugins**: install `homebridge-camera-ffmpeg`.
+
+### Let ReoLook write the camera settings
+
+ReoLook already knows your cameras' names, addresses and sign-in, so it can produce the plugin's
+settings for all of them:
+
+```sh
+node bin/reolook.mjs homekit --bridge-host 192.168.1.10      # print them
+node bin/reolook.mjs homekit --write contrib/homebridge/data/config.json   # or merge them in
+```
+
+* **Printing** gives the `Camera-ffmpeg` block as JSON on standard output (the notes go to standard
+  error, so `> file` or a pipe gets only the JSON). Paste it into the plugin's settings in the
+  Homebridge UI (JSON config), or merge it into `config.json`.
+* **`--write FILE`** merges it into Homebridge's `config.json` for you. It adds the cameras that
+  are missing, refreshes the two addresses of one that is already there (its other settings are
+  left alone), and sets the trigger port only if none is set. Everything else in the file is kept,
+  a `.bak` of the original is made the first time, and running it again changes nothing. The file
+  must already exist (start Homebridge once). If Docker created it, it is owned by root and
+  ReoLook will say so; either paste the printed block into the Homebridge UI, or give yourself the
+  file (`sudo chown $USER contrib/homebridge/data/config.json contrib/homebridge/data`).
+* Names are ReoLook's camera names exactly, which is what a rule's `{camera}` needs.
+* It uses each camera's **sub stream** for live video, which is small enough to transcode
+  comfortably, and the camera's own **snapshot address** for stills. A still taken from the video
+  stream waits for a clean picture and can take so long that Homebridge logs "the image snapshot
+  handler didn't respond".
+* `--http-port N` changes the trigger port (default 8080). The plugin starts its web server only
+  when this port is set. `--config FILE` reads a ReoLook configuration other than the default.
+* The camera password is in the result in plain text; a view-only camera account is enough, and
+  the file should stay private.
+
+After `--write`, restart Homebridge (`docker restart homebridge`). The log should then show
+`Setting up HTTP server on port 8080...`. ReoLook finishes by listing the web addresses to give a
+detection rule for each camera:
+
+```
+http://<the PC>:8080/doorbell?Front%20Porch        # present it as a doorbell press
+http://<the PC>:8080/motion?Front%20Porch          # present it as motion
+http://<the PC>:8080/motion/reset?Front%20Porch    # it has gone
+```
+
+### Writing it by hand
+
+If you would rather not use the command, add each camera to the plugin's `cameras` list yourself.
+The plugin runs its ffmpeg commands without a shell, so **do not put quotes around an address**, and
+percent-encode a password that holds characters such as `@`, `:`, `/` or `#`:
 
 ```json
 {
   "platform": "Camera-ffmpeg",
+  "porthttp": 8080,
   "cameras": [
     {
       "name": "Front Porch",
@@ -58,24 +104,12 @@ camera account is enough, and its password ends up in this file, so keep the fil
       "doorbell": true,
       "videoConfig": {
         "source": "-rtsp_transport tcp -i rtsp://viewer:PASSWORD@192.168.1.242:554/h264Preview_01_sub",
-        "stillImageSource": "-i rtsp://viewer:PASSWORD@192.168.1.242:554/h264Preview_01_sub -frames:v 1",
+        "stillImageSource": "-i http://192.168.1.242/cgi-bin/api.cgi?cmd=Snap&channel=0&rs=reolook&user=viewer&password=PASSWORD -frames:v 1",
         "maxWidth": 1280, "maxHeight": 720, "maxFPS": 15
       }
     }
   ]
 }
-```
-
-Use the camera's **sub stream** (`..._sub`), which is small enough to transcode comfortably. To let
-ReoLook trigger the camera, also set `"porthttp": 8080` on the same `Camera-ffmpeg` platform (the
-plugin starts its HTTP server only when this port is set; pick another port if 8080 is taken, and
-add `"localhttp": true` only if the caller runs on the same PC). Restart Homebridge, and the log
-shows `Setting up HTTP server on port 8080...`. It then accepts motion triggers such as:
-
-```
-http://<the PC>:8080/motion?Front%20Porch          # something happened
-http://<the PC>:8080/motion/reset?Front%20Porch    # it has gone
-http://<the PC>:8080/doorbell?Front%20Porch        # present it as a doorbell press
 ```
 
 Pair in the Home app on your iPad (Add Accessory, More options, then pick the camera and enter

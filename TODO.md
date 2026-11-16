@@ -31,14 +31,13 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
 - [ ] **MQTT has only been tested against a small fake broker.** Needs a real run: broker address,
   `REOLOOK_MQTT_USER` / `REOLOOK_MQTT_PASS` in `~/.config/reolook/env`, then "Send a test event".
   TLS (`mqtts://`) and Home Assistant discovery have not been tried against anything real.
-- [ ] **Apple TV pop-up (HomeKit) is not working yet.** Done: Homebridge runs in Docker
-  (`contrib/homebridge/`), `homebridge-camera-ffmpeg` 4.1.0 is installed, "Front Porch" is
-  configured (motion and doorbell on), and its HTTP trigger server is enabled (`porthttp` 8080;
-  `/motion/reset?Front%20Porch` answers 200). Still to do: pair the camera in the
-  Home app (it is its own accessory; the phone must be on the bridge's VLAN while pairing), turn on activity notifications and the Apple TV option for the camera, confirm the Apple
-  TV shows as a home hub on the same network segment as this PC, put
-  `http://<PC>:8080/doorbell?Front%20Porch` in a rule's web address, press "Send a test event" and
-  see whether a pop-up appears. Then drop the "not run" warning from `docs/homekit.md`.
+- [ ] **Apple TV pop-up (HomeKit): cameras work in the Home app, the pop-up is untried.** Homebridge
+  runs in Docker (`contrib/homebridge/`) with `homebridge-camera-ffmpeg`, the four development
+  cameras are paired and show in the Home app, and `reolook homekit` generates their settings
+  (the command is tested; its output matches what was set up by hand). Still to do: turn on activity
+  notifications and the Apple TV option for each camera, confirm the Apple TV is the home hub, put
+  `http://<PC>:8080/doorbell?<camera>` in a rule's web address, press "Send a test event" and see
+  whether a pop-up appears. Then drop the "not run" warning from `docs/homekit.md`.
 
 ### Live view picture damage
 - [ ] **Watch for damaged live pictures.** ReoLook restarts a stream when its decoder reports bad

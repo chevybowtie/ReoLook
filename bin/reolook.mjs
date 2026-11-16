@@ -18,6 +18,7 @@ import { getProfile } from '../src/capabilities.mjs';
 import { runRetention } from '../src/retention.mjs';
 import { loadCredentials, writeEnvFile, defaultEnvPath } from '../src/credentials.mjs';
 import { xdgDir } from '../src/xdg.mjs';
+import { buildPlatform, triggerUrls, writeHomebridgeConfig, DEFAULT_HTTP_PORT } from '../src/homebridge.mjs';
 import * as svc from '../src/service-install.mjs';
 import readline from 'node:readline/promises';
 import { askLine, askSecret } from '../src/prompt.mjs';
@@ -64,6 +65,11 @@ Commands:
   serve [--config FILE] [--root DIR] [--port N] [--camera "Name=IP" ...]
                                browser UI + recorder service (config record.enabled)
                                (127.0.0.1 only; config default ~/.config/reolook/config.json)
+  homekit [--config FILE] [--write HOMEBRIDGE_CONFIG] [--http-port N] [--bridge-host HOST]
+                               the Homebridge camera settings for every camera in ReoLook (the Apple TV
+                               pop-up route, docs/homekit.md): printed as JSON, or merged into
+                               Homebridge's config.json with --write (a .bak is kept); also lists the
+                               web addresses to give a detection rule
   demo [--port N]              try ReoLook with four simulated cameras (no hardware, nothing real is touched);
                                settings pages: sign in as admin / demo
   record --camera "Name=IP" [--camera ...] --out DIR
@@ -113,6 +119,9 @@ const { values, positionals } = parseArgs({
     all: { type: 'boolean', default: false },
     save: { type: 'boolean', default: false },
     hours: { type: 'string' },
+    write: { type: 'string' },
+    'http-port': { type: 'string' },
+    'bridge-host': { type: 'string' },
   },
 });
 const [command, ...rest] = positionals;
@@ -148,6 +157,9 @@ if (command === 'service') {
 } else if (command === 'detect') {
   await detectCommand();
   process.exit(process.exitCode ?? 0);
+} else if (command === 'homekit') {
+  await homekitCommand();
+  process.exit(process.exitCode ?? 0);
 } else if (command === 'retention') {
   await retention();
   process.exit(process.exitCode ?? 0);
@@ -170,6 +182,42 @@ if (!values.host || !user || !password) {
 
 const channel = Number(values.channel);
 const cam = new ReolinkClient({ host: values.host, user, password, https: values.https });
+
+/**
+ * `homekit`: the Homebridge `Camera-ffmpeg` settings for ReoLook's cameras. Without --write the JSON goes to
+ * standard output (so it can be piped or pasted) and the notes to standard error; with --write it is merged into
+ * that Homebridge config.json. Exit code 2 when there are no cameras, no sign-in, or the file cannot be changed.
+ */
+async function homekitCommand() {
+  try {
+    if (!user || !password) throw new Error('no camera sign-in; run: reolook init');
+    const httpPort = values['http-port'] === undefined ? DEFAULT_HTTP_PORT : Number(values['http-port']);
+    if (!Number.isInteger(httpPort) || httpPort < 1 || httpPort > 65535) throw new Error('--http-port must be a port number');
+    const config = await loadConfig(values.config);
+    if (!config.cameras.length) throw new Error(`no cameras in ${values.config ?? defaultConfigPath}; add them in ReoLook first`);
+    const platform = buildPlatform(config.cameras, { user, password }, { httpPort });
+    const notes = [];
+    if (values.write) {
+      const r = await writeHomebridgeConfig(path.resolve(values.write), platform);
+      console.log(`${r.wrote ? 'updated' : 'already up to date:'} ${values.write}`);
+      for (const [what, names] of [['added', r.added], ['refreshed', r.updated], ['unchanged', r.unchanged]]) if (names.length) console.log(`  ${what}: ${names.join(', ')}`);
+      if (r.backup) console.log(`  the previous file is kept as ${r.backup}`);
+      if (r.wrote) console.log('  restart Homebridge for it to take effect (docker restart homebridge)');
+    } else {
+      console.log(JSON.stringify(platform, null, 2));
+      notes.push('# The block above is the Camera-ffmpeg platform for Homebridge. Merge it into config.json, or use --write.',
+        '# It contains the camera password in plain text: keep it private (a view-only camera account is enough).');
+    }
+    const lines = ['', 'Web addresses for a detection rule (Settings, Detection, "Also call a web address"); use the first for a pop-up, the second to clear it:'];
+    for (const c of config.cameras) {
+      const u = triggerUrls(c.name, { bridgeHost: values['bridge-host'], httpPort });
+      lines.push(`  ${c.name}`, `    ${u.doorbell}`, `    ${u.reset}`);
+    }
+    if (!values['bridge-host']) lines.push('', '  replace <this PC> with the address of the machine running Homebridge (or pass --bridge-host).');
+    lines.push('', 'Then pair each camera in the Home app and turn on its notifications; see docs/homekit.md.');
+    (values.write ? console.log : console.error)([...notes, ...lines].join('\n'));
+  } catch (e) { console.error(`error: ${e.message}`); process.exitCode = 2; }
+}
 
 /**
  * `repairs` [--hours N]: how often each camera's live picture had to be repaired, in bursts, with notes of what was
