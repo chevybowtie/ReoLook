@@ -9,10 +9,12 @@ cameras to HomeKit; ReoLook does not, on purpose (see "Why a separate bridge" be
 ReoLook (detection rules) --web address / MQTT--> bridge container --HomeKit--> Apple TV pop-up
 ```
 
-> **What is verified.** ReoLook's side (the web address call, MQTT, the test button) is tested.
-> The `homekit` command is tested. The bridge and Apple TV side below follows each project's documentation but has **not** been
-> run on your network by the author. Plugin settings change between versions: when a name here
-> disagrees with the plugin's own README, the README wins.
+> **What is verified.** The whole route has been run on the author's network: a rule's *Send a test
+> event* (the doorbell address) made the Apple TV show a "someone is at the door" pop-over with the
+> camera's live picture, for two cameras. The `homekit` command is tested. What is **not** yet
+> verified is a real detection (a peacock, the mail truck) causing the pop-up, and how several
+> pop-ups in a row behave. Plugin settings change between versions: when a name here disagrees with
+> the plugin's own README, the README wins.
 
 ## 1. Apple side (once)
 

@@ -31,13 +31,17 @@ verified, is in `docs/roadmap.md`. Status as of 2026-11-11 (version 0.0.1, from 
 - [ ] **MQTT has only been tested against a small fake broker.** Needs a real run: broker address,
   `REOLOOK_MQTT_USER` / `REOLOOK_MQTT_PASS` in `~/.config/reolook/env`, then "Send a test event".
   TLS (`mqtts://`) and Home Assistant discovery have not been tried against anything real.
-- [ ] **Apple TV pop-up (HomeKit): cameras work in the Home app, the pop-up is untried.** Homebridge
-  runs in Docker (`contrib/homebridge/`) with `homebridge-camera-ffmpeg`, the four development
-  cameras are paired and show in the Home app, and `reolook homekit` generates their settings
-  (the command is tested; its output matches what was set up by hand). Still to do: turn on activity
-  notifications and the Apple TV option for each camera, confirm the Apple TV is the home hub, put
-  `http://<PC>:8080/doorbell?<camera>` in a rule's web address, press "Send a test event" and see
-  whether a pop-up appears. Then drop the "not run" warning from `docs/homekit.md`.
+- [ ] **Apple TV pop-up: the test event works, a real detection has not been seen.** Homebridge
+  runs in Docker (`contrib/homebridge/`), the four development cameras are paired, and
+  `reolook homekit` generates their settings. With notifications on for "Front porch - out" and
+  "Front porch - out 2" and the doorbell address in each rule, *Send a test event* made the Apple TV
+  show a "someone is at the door" pop-over with the live picture. Still to do: wait for a real
+  peacock or mail truck and see the pop-up; add a cooldown to the peacock rule (it has none, so it
+  could pop up repeatedly); try the other two cameras; see how several pop-ups in a row behave.
+- [ ] **Apple Home settings page.** `reolook homekit` is command-line only. A Settings page that shows
+  the generated block with a Copy button, can write it into Homebridge's `config.json`, and a
+  per-rule "Apple TV pop-up" button that fills in the two web addresses, would make this usable
+  without a terminal.
 
 ### Live view picture damage
 - [ ] **Watch for damaged live pictures.** ReoLook restarts a stream when its decoder reports bad
